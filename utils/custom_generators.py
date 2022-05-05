@@ -1,12 +1,16 @@
 import tensorflow as tf
+import threading
+import numpy as np
+from GLC.data_loading.common import load_patch
 
-class RGB_Image_Generator(tf.keras.utils.Sequence) :
+class RGBImageGenerator(tf.keras.utils.Sequence) :
   
-    def __init__(self, obs_ids, labels, batch_size) :
+    def __init__(self, obs_ids, labels, batch_size, data_path) :
         self.obs_ids = obs_ids
         self.labels = labels
         self.batch_size = batch_size
-        
+        self.data_path = data_path
+
         # to make the generator thread safe 
         self.lock = threading.Lock()
 
@@ -21,19 +25,20 @@ class RGB_Image_Generator(tf.keras.utils.Sequence) :
         for i in range(idx * self.batch_size, (idx+1) * self.batch_size):
             if i >= len(self.obs_ids): break
             
-            patch = load_patch(self.obs_ids[i], DATA_PATH, data='rgb')
+            patch = load_patch(self.obs_ids[i], self.data_path, data='rgb')
             X_batch.append(patch[0])
             y_batch.append(self.labels[i])
 
         with self.lock:
             return np.asarray(X_batch), np.array(y_batch)
-        
-class Full_Satellite_Generator(tf.keras.utils.Sequence) :
+
+class FullSatelliteGenerator(tf.keras.utils.Sequence) :
   
-    def __init__(self, obs_ids, labels, batch_size) :
+    def __init__(self, obs_ids, labels, batch_size, data_path) :
         self.obs_ids = obs_ids
         self.labels = labels
         self.batch_size = batch_size
+        self.data_path = data_path
         
         # to make the generator thread safe 
         self.lock = threading.Lock()
@@ -49,7 +54,7 @@ class Full_Satellite_Generator(tf.keras.utils.Sequence) :
         for i in range(idx * int(self.batch_size/2), (idx+1) * int(self.batch_size/2)):
             if i >= len(self.obs_ids): break
             
-            rgb, near_ir, landcover, altitude = load_patch(self.obs_ids[i], DATA_PATH)
+            rgb, near_ir, landcover, altitude = load_patch(self.obs_ids[i], self.data_path)
 
             ni = near_ir.reshape(256, 256, 1)
             lc = landcover.reshape(256, 256, 1)
@@ -67,13 +72,14 @@ class Full_Satellite_Generator(tf.keras.utils.Sequence) :
 
         with self.lock:
             return np.asarray(X_batch), np.array(y_batch)
-        
+
 class Patches_Generator_CNN(tf.keras.utils.Sequence) :
   
-    def __init__(self, obs_ids, labels, batch_size) :
+    def __init__(self, obs_ids, labels, batch_size, data_path) :
         self.obs_ids = obs_ids
         self.labels = labels
         self.batch_size = batch_size
+        self.data_path = data_path
         
         # to make the generator thread safe 
         self.lock = threading.Lock()
@@ -90,7 +96,7 @@ class Patches_Generator_CNN(tf.keras.utils.Sequence) :
         for i in range(idx * self.batch_size, (idx+1) * self.batch_size):
             if i >= len(self.obs_ids): break
             
-            rgb, near_ir, landcover, altitude = load_patch(self.obs_ids[i], DATA_PATH)
+            rgb, near_ir, landcover, altitude = load_patch(self.obs_ids[i], self.data_path)
 
             ni = near_ir.reshape(256, 256, 1)
             lc = landcover.reshape(256, 256, 1)

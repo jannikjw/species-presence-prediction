@@ -7,7 +7,7 @@ class DataLoader():
     '''
     Class to handle all data-related tasks
     '''
-    def __init__(self, data_path="../geolifeclef-2022-lifeclef-2022-fgvc9/"):
+    def __init__(self, data_path="./geolifeclef-2022-lifeclef-2022-fgvc9/"):
         # let's load the data from file
         self.data_path = Path(data_path)
         
@@ -46,6 +46,8 @@ class DataLoader():
         return observation_ids, labels
     
     def load_environmental_data(self, train_ids, val_ids):
+        df_obs = self.df_obs
+        
         df_obs_bio = pd.read_csv(self.data_path / "pre-extracted" / "environmental_vectors.csv", sep=";", index_col="observation_id")
         df_environmental_vars = pd.read_csv(self.data_path / "metadata" / "environmental_variables.csv", sep=";", index_col="name")
 
@@ -63,17 +65,24 @@ class DataLoader():
                 
         return df_train, df_val
     
-def rename_environmental_table(self, df):
-    # rename columns of joined table with meaningful descriptions        
-    environmental_vars = list(df_environmental_vars['description'])
-    environmental_vars.append('latitude')
-    environmental_vars.append('longitude')
+    def get_data_path(self):
+        return self.data_path
+    
+    def set_data_path(self, data_path):
+        self.data_path = Path(path)
+    
+    def rename_environmental_table(self, df):
+        # rename columns of joined table with meaningful descriptions 
+        df_environmental_vars = pd.read_csv(self.data_path / "metadata" / "environmental_variables.csv", sep=";", index_col="name")
+        environmental_vars = list(df_environmental_vars['description'])
+        environmental_vars.append('latitude')
+        environmental_vars.append('longitude')
 
-    df.columns = environmental_vars
+        df.columns = environmental_vars
 
-    return df
+        return df
 
-def transform_table_to_sentences(self, df):
+def transform_table_to_sentences(df):
     # convert numerical values to strings 
     df = df.astype(str)
 
@@ -94,13 +103,6 @@ def tokenize(sentences, tokenizer, max_length):
         input_masks.append(inputs['attention_mask'])
         input_segments.append(inputs['token_type_ids'])
     return np.asarray(input_ids, dtype = "int32"), np.asarray(input_masks, dtype = "int32"), np.asarray(input_segments, dtype = "int32")
-
-    
-    def get_data_path(self):
-        return self.data_path
-    
-    def set_data_path(self, data_path):
-        self.data_path = Path(path)
     
 if __name__ == "__main__":
     loader = DataLoader()
