@@ -3,7 +3,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from utils.custom_layers import SwapAxes
 
-def data_augmentation_transformer(output_size, contrast=0.2, flip='horizontal', rotation=0.02):
+def data_augmentation_transformer(output_size, contrast=0.1, flip='horizontal', rotation=0.02):
     '''
     Augment data for Transformers
 

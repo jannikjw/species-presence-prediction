@@ -5,7 +5,7 @@ from utils.augmentation import data_augmentation_transformer, data_augmentation_
 from GLC.data_loading.common import load_patch
 from utils.data_loader import DataLoader
 
-def visualize_augmentation(ids_list, data_path, num_images=4):
+def visualize_augmentation(ids_list, data_path, num_images=4, contrast=0.1, flip='horizontal', rotation=0.02):
     plt.figure(figsize=(16, 16))
     images = []
     for i in range(num_images):
@@ -13,10 +13,24 @@ def visualize_augmentation(ids_list, data_path, num_images=4):
 
     for i in range(num_images):
         image = np.array(load_patch(ids_list[i], data_path, data='rgb')).reshape(256, 256, 3)
-        images.append(data_augmentation_cnn(256)(image).numpy())
+        images.append(data_augmentation_cnn(256, contrast=contrast, flip=flip, rotation=rotation)(image).numpy())
 
     for i, image in enumerate(images):
         ax = plt.subplot(num_images, num_images, i + 1)
+        plt.imshow(image.astype("uint8"))
+        plt.axis("off")
+        
+def visualize_sat(ids_list, image, data_path):
+    plt.figure(figsize=(16, 16))
+    images = []
+    rgb, near_ir, landcover, altitude = load_patch(ids_list[image], data_path)
+    images.append(np.array(rgb).reshape(256, 256, 3))
+    images.append(near_ir)
+    images.append(landcover)
+    images.append(altitude)
+    
+    for i, image in enumerate(images):
+        ax = plt.subplot(1, 4, i + 1)
         plt.imshow(image.astype("uint8"))
         plt.axis("off")
         
