@@ -34,6 +34,7 @@ def data_augmentation_cnn(output_size, contrast=0.2, flip='horizontal', rotation
     data_augmentation = keras.Sequential(
         [
             layers.Resizing(output_size, output_size),
+            layers.Rescaling(1./255),
             layers.RandomContrast(0.2),
             layers.RandomFlip("horizontal"),
             layers.RandomRotation(factor=0.02),

@@ -2,6 +2,9 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import random
+
+random.seed(2)
 
 class DataLoader():
     '''
@@ -18,7 +21,7 @@ class DataLoader():
     def subset_labels(self, set_type, num_labels=10):
         '''
         Select only a subset of labels
-        Returns: observation
+        Returns: observation ids and labels
         '''
         if set_type not in ['train', 'val']: 
             return 'You need to choose one of the set types "train" or "val".'
@@ -44,6 +47,69 @@ class DataLoader():
         labels = df_obs.loc[observation_ids]["species_id"].values
 
         return observation_ids, labels
+    
+    def subset_labels_dense(self, num_labels=10, min_obs=1000, max_obs=2000):
+        '''
+        Select only a subset of labels that have a certain number of observations.
+        '''
+        subset_size = 0
+        obs_train = list()
+        obs_test = list()
+        obs_val = list()
+
+        df_obs = self.df_obs
+        # select the ids from the given subset
+        labels = df_obs["species_id"].values       
+
+        # iterate over a subset of the labels
+        for label in set(labels):
+            if (subset_size >= num_labels): break
+                
+            obs = df_obs.index[(df_obs["species_id"] == label)]
+
+            if(len(obs) >= min_obs and len(obs) <= max_obs):
+                # for each label, retrieve all corresponding observation ids
+                train_obs = set(df_obs[(df_obs["species_id"] == label) & (df_obs["subset"] == 'train')].index.values)
+                val_obs = df_obs[(df_obs["species_id"] == label) & (df_obs["subset"] == 'val')].index.values
+                
+                # take 10% of train set as test set
+                test = random.sample(train_obs, int(len(obs)/10))
+                train = set(obs) - set(test)
+                obs_test.append(list(test))
+                obs_train.append(list(train))
+                subset_size += 1
+                
+                obs_val.append(val_obs)
+                
+        # we now have a numpy array of all observation ids corresponding to this subset of labels
+        train_ids = np.concatenate(obs_train)
+        val_ids = np.concatenate(obs_val)
+        test_ids = np.concatenate(obs_test)
+
+        # obtain the labels in the right order         
+        y_train = df_obs.loc[train_ids]["species_id"].values
+        y_val = df_obs.loc[val_ids]["species_id"].values        
+        y_test = df_obs.loc[test_ids]["species_id"].values
+        
+        return train_ids, y_train, val_ids, y_val, test_ids, y_test
+    
+    def subset_val_dense(self, train_labels):
+        df_obs = self.df_obs
+        
+        obs_list = list()
+
+        # iterate over a subset of the labels
+        counter = 0
+        for label in (set(train_labels)):
+            # for each label, retrieve all corresponding observation ids
+            obs = df_obs.index[(df_obs["species_id"] == label) & (df_obs["subset"] == "val")].values
+            obs_list.append(obs)
+            
+        # we now have a numpy array of all observation ids corresponding to this subset of labels
+        val_ids = np.concatenate(obs_id)
+
+        # obtain the labels in the right order 
+        y_val = df_obs.loc[obs_id_val]["species_id"].values
     
     def load_environmental_data(self, train_ids, val_ids):
         df_obs = self.df_obs
@@ -106,3 +172,6 @@ def tokenize(sentences, tokenizer, max_length):
     
 if __name__ == "__main__":
     loader = DataLoader()
+# -
+
+
