@@ -91,27 +91,21 @@ class DataLoader():
         y_val = df_obs.loc[val_ids]["species_id"].values        
         y_test = df_obs.loc[test_ids]["species_id"].values
         
+        # remap labels to new subset size
+        map_labels = {}
+        for i, label in enumerate(set(y_train)):
+            map_labels[label] = i
+        
+        for i, label in enumerate(y_train):
+            y_train[i] = map_labels[label]
+        for i, label in enumerate(y_val):
+            y_val[i] = map_labels[label]
+        for i, label in enumerate(y_test):
+            y_test[i] = map_labels[label]
+
         return train_ids, y_train, val_ids, y_val, test_ids, y_test
     
-    def subset_val_dense(self, train_labels):
-        df_obs = self.df_obs
-        
-        obs_list = list()
-
-        # iterate over a subset of the labels
-        counter = 0
-        for label in (set(train_labels)):
-            # for each label, retrieve all corresponding observation ids
-            obs = df_obs.index[(df_obs["species_id"] == label) & (df_obs["subset"] == "val")].values
-            obs_list.append(obs)
-            
-        # we now have a numpy array of all observation ids corresponding to this subset of labels
-        val_ids = np.concatenate(obs_id)
-
-        # obtain the labels in the right order 
-        y_val = df_obs.loc[obs_id_val]["species_id"].values
-    
-    def load_environmental_data(self, train_ids, val_ids):
+    def load_environmental_data(self, train_ids, val_ids, test_ids):
         df_obs = self.df_obs
         
         df_obs_bio = pd.read_csv(self.data_path / "pre-extracted" / "environmental_vectors.csv", sep=";", index_col="observation_id")
@@ -120,16 +114,19 @@ class DataLoader():
         # collect gps data for selected observations
         gps_data_train = df_obs.loc[train_ids][['latitude', 'longitude']]
         gps_data_val = df_obs.loc[val_ids][['latitude', 'longitude']]
+        gps_data_test = df_obs.loc[test_ids][['latitude', 'longitude']]
 
         # collect biological and pedologic data
         bio_data_train = df_obs_bio.loc[train_ids]
         bio_data_val = df_obs_bio.loc[val_ids]
-
+        bio_data_test = df_obs_bio.loc[test_ids]
+        
         # join environmental data and GPS coordinates
         df_train = bio_data_train.join(gps_data_train)
         df_val = bio_data_val.join(gps_data_val)
-                
-        return df_train, df_val
+        df_test = bio_data_test.join(gps_data_test)
+
+        return df_train, df_val, df_test
     
     def get_data_path(self):
         return self.data_path

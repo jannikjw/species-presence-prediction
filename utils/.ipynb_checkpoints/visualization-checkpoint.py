@@ -34,13 +34,13 @@ def visualize_sat(ids_list, image, data_path):
         plt.imshow(image.astype("uint8"))
         plt.axis("off")
         
-def plot_training_results(results):
+def plot_training_results(results, top_k=5):
     fig, axs = plt.subplots(1, 2, figsize=(10,6))
     axs[0].plot(range(len(results.history['loss'])), results.history['loss'])
     axs[0].set_xlabel('Epochs')
     axs[0].set_ylabel('Loss')
     axs[1].plot(range(len(results.history['val_accuracy'])), results.history['val_accuracy'], label='Validation accuracy')
-    axs[1].plot(range(len(results.history['val_top-10-accuracy'])), results.history['val_top-10-accuracy'], label='Top-10 Validation accuracy')
+    axs[1].plot(range(len(results.history['val_top-{}-accuracy'.format(top_k)])), results.history['val_top-{}-accuracy'.format(top_k)], label='Top-{} Validation accuracy'.format(top_k))
     axs[1].legend()
     axs[1].set_xlabel('Epochs')
     axs[1].set_ylabel('Accuracy')
