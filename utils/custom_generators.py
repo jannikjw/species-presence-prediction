@@ -73,7 +73,7 @@ class FullSatelliteGenerator(tf.keras.utils.Sequence) :
         with self.lock:
             return np.asarray(X_batch), np.array(y_batch)
 
-class Patches_Generator_CNN(tf.keras.utils.Sequence) :
+class FullSatelliteGeneratorChannels(tf.keras.utils.Sequence) :
   
     def __init__(self, obs_ids, labels, batch_size, data_path) :
         self.obs_ids = obs_ids
@@ -90,7 +90,6 @@ class Patches_Generator_CNN(tf.keras.utils.Sequence) :
     # returns one batch
     def __getitem__(self, idx) :
         X_batch = list()
-        X_env_batch = list()
         y_batch = list()
 
         for i in range(idx * self.batch_size, (idx+1) * self.batch_size):
@@ -106,11 +105,9 @@ class Patches_Generator_CNN(tf.keras.utils.Sequence) :
             
             X_batch.append(patch)
             y_batch.append(self.labels[i])
-            
-            X_env_batch.append(tabular_train[self.obs_ids[i]].values)
-            
+                        
         with self.lock:
-            return {'input_1': np.asarray(X_batch), 'input_2': np.asarray(X_env_batch)}, np.asarray(np.array(y_batch))
+            return np.asarray(X_batch), np.array(y_batch)
 
 
 # +
@@ -149,7 +146,7 @@ class MultimodalTransformerGenerator(tf.keras.utils.Sequence) :
             X_batch.append(rgb)
             y_batch.append(self.labels[i])
             
-            X_env_batch.append(self.env_df[i])
+            X_env_batch.append(self.env_df.loc[self.obs_ids[i]].values.reshape(-1, 1))
             
         with self.lock:
             return {'input_1': np.asarray(X_batch), 'input_2': np.asarray(X_env_batch)}, np.asarray(np.array(y_batch))
