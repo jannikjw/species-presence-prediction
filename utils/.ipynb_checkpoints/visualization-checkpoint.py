@@ -1,9 +1,28 @@
 # +
 import matplotlib.pyplot as plt
 import numpy as np
-from utils.augmentation import data_augmentation_transformer, data_augmentation_cnn
+import tensorflow as tf
 from GLC.data_loading.common import load_patch
 from utils.data_loader import DataLoader
+
+def data_augmentation(output_size, contrast=0.2, flip='horizontal', rotation=0.02):
+    '''
+    Augment data for CNNs
+    
+    Input Shape = (X, X, channels)
+    Output Shape = (image_size, image_size, channels)
+    '''
+    data_augmentation = tf.keras.Sequential(
+        [
+            tf.keras.layers.Resizing(output_size, output_size),
+            tf.keras.layers.RandomContrast(0.2),
+            tf.keras.layers.RandomFlip("horizontal"),
+            tf.keras.layers.RandomRotation(factor=0.02),
+        ],
+        name="data_augmentation",
+    )
+    return data_augmentation
+
 
 def visualize_augmentation(ids_list, data_path, num_images=4, contrast=0.1, flip='horizontal', rotation=0.02):
     plt.figure(figsize=(16, 16))
@@ -13,7 +32,7 @@ def visualize_augmentation(ids_list, data_path, num_images=4, contrast=0.1, flip
 
     for i in range(num_images):
         image = np.array(load_patch(ids_list[i], data_path, data='rgb')).reshape(256, 256, 3)
-        images.append(data_augmentation_cnn(256, contrast=contrast, flip=flip, rotation=rotation)(image).numpy())
+        images.append(data_augmentation(256, contrast=contrast, flip=flip, rotation=rotation)(image).numpy())
 
     for i, image in enumerate(images):
         ax = plt.subplot(num_images, num_images, i + 1)
