@@ -1,4 +1,4 @@
-# Location-based Species Presence Prediction
+# Location-Based Species Presence Prediction
 Submission to the GeoLifeCLEF 2022 - LifeCLEF 2022 x FGVC9 Kaggle competition
 
 # Members
