@@ -1,5 +1,5 @@
 # Location-Based Species Presence Prediction
-Submission to the GeoLifeCLEF 2022 - LifeCLEF 2022 x FGVC9 Kaggle competition
+Submission to the [GeoLifeCLEF 2022 - LifeCLEF 2022 x FGVC9 Kaggle competition](https://www.kaggle.com/c/geolifeclef-2022-lifeclef-2022-fgvc9)
 
 # Members
 Kennedy Ariana Salamat (kas2319)
@@ -7,13 +7,11 @@ Jannik Jerrit Wiedenhaupt (jjw2196)
 Nathalie Marie Hager (nmh2147)
 
 # Project Description
+For a full discussion of the project, please read our [research paper](Species_Prediction_Paper.pdf).
+
 The aim of this project is to predict the localization of plant and animal species.
 To do so, 1.6M geo-localized observations from France and the US of 17K species are used from the Kaggle competition (9K plant species and 8K animal species). These observations are paired with aerial images and environmental features around them.
 The goal is, for each GPS position in the test set, to return a set of candidate species that should contain the true observed species.
-
-Full Research Paper: [](/Species_Prediction_Paper.pdf)
-
-Link to Kaggle Competition: https://www.kaggle.com/c/geolifeclef-2022-lifeclef-2022-fgvc9
 
 ![Exemplary Image Data](images/image_sat.png)
 
